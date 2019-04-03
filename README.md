@@ -1,1 +1,1 @@
-# Xinuk [![Build Status](https://travis-ci.com/ddworak/xinuk.svg?token=oyDuQ2tC1pzqx4bUjNoW&branch=master)](https://travis-ci.com/ddworak/xinuk)
+# Xinuk [![Build Status](https://travis-ci.org/Lukasz1928/xinuk.svg?branch=master)](https://travis-ci.org/Lukasz1928/xinuk)
