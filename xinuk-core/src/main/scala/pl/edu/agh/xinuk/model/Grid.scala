@@ -8,19 +8,20 @@ final case class Grid(cells: CellArray) extends AnyVal {
 
   import Grid._
 
-  def propagatedSignal(calculateSmellAddends: (CellArray, Int, Int) => Vector[Option[Signal]], x: Int, y: Int)(implicit config: XinukConfig): GridPart = {
+  def propagatedSignal(calculateSmellAddends: (CellArray, Int, Int) => Vector[Option[SignalArray]], x: Int, y: Int)(implicit config: XinukConfig): GridPart = {
     val current = cells(x)(y)
     current match {
       case Obstacle => current
       case smelling: SmellMedium =>
         val currentSmell = current.smell
         val addends = calculateSmellAddends(cells, x, y)
-        val (newSmell, _) = addends.foldLeft(Array.ofDim[Signal](Cell.Size, Cell.Size), 0) { case ((cell, index), signalOpt) =>
-          val (i, j) = SubcellCoordinates(index)
-          cell(i)(j) = (currentSmell(i)(j) * config.signalAttenuationFactor) + (signalOpt.getOrElse(Signal.Zero) * config.signalSuppressionFactor)
-          (cell, index + 1)
+        val (newSmell, _) = addends.foldLeft(Array.ofDim[SignalArray](Cell.Size, Cell.Size), 0) {
+          case ((cell, index), signalOpt) =>
+            val (i, j) = SubcellCoordinates(index)
+              cell(i)(j) = (currentSmell(i)(j) * config.signalAttenuationFactor) + (signalOpt.getOrElse(SignalArray.Zero) * config.signalSuppressionFactor)
+            (cell, index + 1)
         }
-        newSmell(1)(1) = Signal.Zero
+        newSmell(1)(1) = SignalArray.Zero
         smelling.withSmell(newSmell)
     }
   }
@@ -50,7 +51,32 @@ object Grid {
       case j if !(i == 0 && j == 0) => (x + i, y + j)
     })
   }
+}
 
+
+final case class SignalArray(value: Array[Signal]) extends AnyVal {
+  def apply(index: Int): Signal = value(index)
+
+  def +(other: SignalArray) = SignalArray(value.zipWithIndex.map{
+    case (signal, index) => signal + other(index)
+  })
+
+  def -(other: SignalArray) = SignalArray(value.zipWithIndex.map{
+    case (signal, index) => signal - other(index)
+  })
+
+  def *(scalar: Double) = SignalArray(value.map(_ * scalar))
+
+  def /(scalar: Double) = SignalArray(value.map(_ / scalar))
+}
+
+object SignalArray {
+  implicit class SignalArrayOps(signalList: List[Signal]) {
+    def toSignalVector: SignalArray = SignalArray(signalList.toArray)
+  }
+
+  final val Signals = 2
+  final val Zero = SignalArray(Array.fill(Signals)(Signal.Zero))
 }
 
 final case class Signal(value: Double) extends AnyVal with Ordered[Signal] {
@@ -94,14 +120,19 @@ trait SmellMedium extends GridPart {
 
   import Cell._
 
-  final def smellWith(added: Signal): SmellArray = smell + added
+  final def smellWith(added: SignalArray): SmellArray = {
+    smell + added
+  }
 
-  final def smellWithout(deducted: Signal): SmellArray = {
+  final def smellWithout(deducted: SignalArray): SmellArray = {
     Array.tabulate(Cell.Size, Cell.Size)((i, j) => smell(i)(j) - deducted)
   }
 
   final def smellWithoutArray(deducted: SmellArray): SmellArray = {
-    Array.tabulate(Cell.Size, Cell.Size)((i, j) => smell(i)(j) - deducted(i)(j))
+    for (k <- 0 to deducted.length) {
+      Array.tabulate(Cell.Size, Cell.Size)((i, j) => smell(k)(i)(j) - deducted(k)(i)(j))
+    }
+    smell
   }
 
   def withSmell(smell: SmellArray): Self
@@ -113,25 +144,27 @@ trait SmellingCell extends SmellMedium {
 
 object Cell {
 
-  type SmellArray = Array[Array[Signal]]
+  type SmellArray = Array[Array[SignalArray]]
 
   implicit class SmellArrayOps(private val arr: SmellArray) extends AnyVal {
     def +(other: SmellArray): SmellArray = {
       Array.tabulate(Cell.Size, Cell.Size)((x, y) => arr(x)(y) + other(x)(y))
     }
 
-    def +(added: Signal): SmellArray = {
+    def +(added: SignalArray): SmellArray = {
       Array.tabulate(Cell.Size, Cell.Size)((i, j) => arr(i)(j) + added)
     }
   }
 
   final val Size: Int = 3
 
-  def emptySignal: SmellArray = Array.fill(Cell.Size, Cell.Size)(Signal.Zero)
+  def emptySignal: SmellArray = Array.fill(Cell.Size, Cell.Size)(SignalArray.Zero)
+
+
 }
 
 case object Obstacle extends GridPart {
-  override val smell: SmellArray = Array.fill(Cell.Size, Cell.Size)(Signal.Zero)
+  override val smell: SmellArray = Array.fill(Cell.Size, Cell.Size)(SignalArray.Zero)
 }
 
 final case class BufferCell(cell: SmellingCell) extends SmellMedium with GridPart {
@@ -150,5 +183,5 @@ final case class EmptyCell(smell: SmellArray) extends SmellingCell {
 }
 
 object EmptyCell {
-  final val Instance: EmptyCell = EmptyCell(Cell.emptySignal)
+  final def Instance: EmptyCell = EmptyCell(Cell.emptySignal)
 }

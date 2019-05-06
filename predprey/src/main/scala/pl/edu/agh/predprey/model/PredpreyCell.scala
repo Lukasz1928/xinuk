@@ -10,5 +10,5 @@ final case class PredpreyCell(smell: SmellArray) extends SmellingCell {
 }
 
 object PredpreyCell {
-  def create(initialSignal: Signal): PredpreyCell = PredpreyCell(Array.fill(Cell.Size, Cell.Size)(initialSignal))
+  def create(initialSignal: Signal): PredpreyCell = PredpreyCell(Cell.emptySignal)
 }
