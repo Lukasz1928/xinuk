@@ -1,7 +1,7 @@
 package pl.edu.agh.predprey.model.parallel
 
 import pl.edu.agh.predprey.config.PredpreyConfig
-import pl.edu.agh.predprey.model.PredpreyCell
+import pl.edu.agh.predprey.model.{LoudCell, PredpreyCell}
 import pl.edu.agh.predprey.simulation.PredpreyMetrics
 import pl.edu.agh.xinuk.model._
 import pl.edu.agh.xinuk.model.parallel.ConflictResolver
@@ -22,6 +22,14 @@ object PredpreyConflictResolver extends ConflictResolver[PredpreyConfig] {
         (PredpreyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
       case (PredpreyCell(currentSmell), PredpreyCell(incomingSmell)) =>
         (PredpreyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
+      case (PredpreyCell(currentSmell), LoudCell(incomingSmell)) =>
+        (PredpreyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
+      case (LoudCell(incomingSmell), PredpreyCell(currentSmell)) =>
+        (PredpreyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
+      case (LoudCell(currentSmell), EmptyCell(incomingSmell)) =>
+        (LoudCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
+      case (EmptyCell(incomingSmell), LoudCell(currentSmell)) =>
+        (LoudCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
       case (x, y) => throw new UnsupportedOperationException(s"Unresolved conflict: $x with $y")
     }
   }

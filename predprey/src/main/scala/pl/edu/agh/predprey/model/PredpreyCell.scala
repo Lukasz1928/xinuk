@@ -1,7 +1,7 @@
 package pl.edu.agh.predprey.model
 
 import pl.edu.agh.xinuk.model.Cell.SmellArray
-import pl.edu.agh.xinuk.model.{Cell, Signal, SmellingCell}
+import pl.edu.agh.xinuk.model.{Cell, Signal, SignalArray, SmellingCell}
 
 final case class PredpreyCell(smell: SmellArray) extends SmellingCell {
   override type Self = PredpreyCell
@@ -10,5 +10,5 @@ final case class PredpreyCell(smell: SmellArray) extends SmellingCell {
 }
 
 object PredpreyCell {
-  def create(initialSignal: Signal): PredpreyCell = PredpreyCell(Cell.emptySignal)
+  def create(initialSignal: SignalArray): PredpreyCell = PredpreyCell(Array.fill(Cell.Size, Cell.Size)(SignalArray(Array(initialSignal(0), Signal(0)))))
 }

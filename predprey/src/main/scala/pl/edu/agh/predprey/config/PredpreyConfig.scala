@@ -1,7 +1,7 @@
 package pl.edu.agh.predprey.config
 
 import pl.edu.agh.xinuk.config.{GuiType, XinukConfig}
-import pl.edu.agh.xinuk.model.Signal
+import pl.edu.agh.xinuk.model.{Signal, SignalArray}
 
 final case class PredpreyConfig(
                              gridSize: Int,
@@ -16,5 +16,5 @@ final case class PredpreyConfig(
                              signalSpeedRatio: Int,
                              iterationsNumber: Long,
 
-                             mockInitialSignal: Signal
+                             predpreyInitialSignal: Array[Signal]
                            ) extends XinukConfig
