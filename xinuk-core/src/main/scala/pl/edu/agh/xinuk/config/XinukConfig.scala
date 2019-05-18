@@ -5,14 +5,15 @@ import com.avsystem.commons.misc.{AbstractNamedEnumCompanion, NamedEnum}
 trait XinukConfig {
   def gridSize: Int
   def guiCellSize: Int
-  def signalSuppressionFactor: Double
-  def signalAttenuationFactor: Double
+  def smellsNumber: Int
+  def signalSuppressionFactor: List[Double]
+  def signalAttenuationFactor: List[Double]
   def workersRoot: Int
   def shardingMod: Int
 
   def guiType: GuiType
   def isSupervisor: Boolean
-  def signalSpeedRatio: Int
+  def signalSpeedRatio: List[Int]
   def iterationsNumber: Long
 }
 

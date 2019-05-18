@@ -16,8 +16,8 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
   override def initialGrid: (Grid, PredpreyMetrics) = {
     val grid = Grid.empty(bufferZone)
 
-    grid.cells(3 * config.gridSize / 4)(3 * config.gridSize / 4) = PredpreyCell.create(SignalArray(config.predpreyInitialSignal))
-    grid.cells(config.gridSize / 4)(config.gridSize / 4) = LoudCell.create(SignalArray(config.predpreyInitialSignal))
+    grid.cells(3 * config.gridSize / 4)(3 * config.gridSize / 4) = PredpreyCell.create(SignalArray(config.predpreyCellInitialSignal))
+    grid.cells(config.gridSize / 4)(config.gridSize / 4) = LoudCell.create(SignalArray(config.loudCellInitialSignal))
 
     val metrics = PredpreyMetrics.empty()
     (grid, metrics)
@@ -34,8 +34,8 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
       val destination = (x + random.nextInt(3) - 1, y + random.nextInt(3) - 1)
       val vacatedCell = EmptyCell(cell.smell)
       val occupiedCell = cell match {
-        case PredpreyCell(_) => PredpreyCell.create(SignalArray(config.predpreyInitialSignal))
-        case LoudCell(_) => LoudCell.create(SignalArray(config.predpreyInitialSignal))
+        case PredpreyCell(_) => PredpreyCell.create(SignalArray(config.predpreyCellInitialSignal))
+        case LoudCell(_) => LoudCell.create(SignalArray(config.loudCellInitialSignal))
         case _ => EmptyCell(cell.smell)
       }
 

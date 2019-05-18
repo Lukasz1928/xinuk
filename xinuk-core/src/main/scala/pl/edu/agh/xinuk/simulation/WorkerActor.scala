@@ -44,7 +44,7 @@ class WorkerActor[ConfigType <: XinukConfig](
   override def receive: Receive = stopped
 
   private def propagateSignal(): Unit = {
-    (0 until config.signalSpeedRatio).foreach { _ =>
+    (0 until config.signalSpeedRatio(1)).foreach { _ =>
       val cells = Array.tabulate(config.gridSize, config.gridSize)((x, y) =>
         grid.propagatedSignal(smellPropagationFunction, x, y)
       )

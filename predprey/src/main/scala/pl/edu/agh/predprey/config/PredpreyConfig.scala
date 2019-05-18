@@ -6,15 +6,17 @@ import pl.edu.agh.xinuk.model.{Signal, SignalArray}
 final case class PredpreyConfig(
                              gridSize: Int,
                              guiCellSize: Int,
-                             signalSuppressionFactor: Double,
-                             signalAttenuationFactor: Double,
+                             smellsNumber: Int,
+                             signalSuppressionFactor: List[Double],
+                             signalAttenuationFactor: List[Double],
                              workersRoot: Int,
                              shardingMod: Int,
 
                              guiType: GuiType,
                              isSupervisor: Boolean,
-                             signalSpeedRatio: Int,
+                             signalSpeedRatio: List[Int],
                              iterationsNumber: Long,
 
-                             predpreyInitialSignal: Array[Signal]
+                             predpreyCellInitialSignal: Array[Signal],
+                             loudCellInitialSignal: Array[Signal]
                            ) extends XinukConfig
