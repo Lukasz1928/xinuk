@@ -11,7 +11,7 @@ final case class Grid(cells: CellArray) extends AnyVal {
   def propagatedSignal(calculateSmellAddends: (CellArray, Int, Int) => Vector[Option[SignalArray]], x: Int, y: Int)(implicit config: XinukConfig): GridPart = {
     val current = cells(x)(y)
     current match {
-      case Obstacle(_) => current
+      case Obstacle() => current
       case smelling: SmellMedium =>
         val currentSmell = current.smell
         val addends = calculateSmellAddends(cells, x, y)
@@ -31,7 +31,7 @@ object Grid {
 
   type CellArray = Array[Array[GridPart]]
 
-  def empty(bufferZone: Set[(Int, Int)], emptyCellFactory: => SmellingCell = EmptyCell.Instance)(implicit config: XinukConfig): Grid = {
+  def empty(bufferZone: Set[(Int, Int)], emptyCellFactory: => SmellingCell)(implicit config: XinukConfig): Grid = {
     val n = config.gridSize
 
     val values = Array.tabulate[GridPart](n, n) {
@@ -165,7 +165,7 @@ object Cell {
 
 }
 
-final case class Obstacle(implicit config: XinukConfig) extends GridPart {
+final case class Obstacle()(implicit config: XinukConfig) extends GridPart {
   override val smell: SmellArray = Array.fill(Cell.Size, Cell.Size)(SignalArray.Zero)
 }
 

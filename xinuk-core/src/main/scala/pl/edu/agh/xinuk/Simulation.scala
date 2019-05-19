@@ -24,7 +24,7 @@ class Simulation[ConfigType <: XinukConfig : ValueReader](
   metricHeaders: Vector[String],
   conflictResolver: ConflictResolver[ConfigType],
   smellPropagationFunction: (CellArray, Int, Int) => Vector[Option[SignalArray]],
-  emptyCellFactory: => SmellingCell = EmptyCell.Instance)(
+  emptyCellFactory: => SmellingCell)(
   movesControllerFactory: (TreeSet[(Int, Int)], ConfigType) => MovesController,
   cellToColor: PartialFunction[GridPart, Color] = PartialFunction.empty
 ) extends LazyLogging {

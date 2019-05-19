@@ -12,8 +12,8 @@ object PredpreyConflictResolver extends ConflictResolver[PredpreyConfig] {
 
   override def resolveConflict(current: GridPart, incoming: SmellingCell)(implicit config: PredpreyConfig): (GridPart, PredpreyMetrics) = {
     (current, incoming) match {
-      case (Obstacle, _) =>
-        (Obstacle, PredpreyMetrics.empty())
+      case (Obstacle(), _) =>
+        (Obstacle(), PredpreyMetrics.empty())
       case (EmptyCell(currentSmell), EmptyCell(incomingSmell)) =>
         (EmptyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
       case (PredpreyCell(currentSmell), EmptyCell(incomingSmell)) =>

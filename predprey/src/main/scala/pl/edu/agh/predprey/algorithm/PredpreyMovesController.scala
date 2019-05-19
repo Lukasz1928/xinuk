@@ -14,7 +14,7 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
   private val random = new Random(System.nanoTime())
 
   override def initialGrid: (Grid, PredpreyMetrics) = {
-    val grid = Grid.empty(bufferZone)
+    val grid = Grid.empty(bufferZone, EmptyCell.Instance)
 
     grid.cells(3 * config.gridSize / 4)(3 * config.gridSize / 4) = PredpreyCell.create(SignalArray(config.predpreyCellInitialSignal))
     grid.cells(config.gridSize / 4)(config.gridSize / 4) = LoudCell.create(SignalArray(config.loudCellInitialSignal))
@@ -24,7 +24,7 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
   }
 
   override def makeMoves(iteration: Long, grid: Grid): (Grid, PredpreyMetrics) = {
-    val newGrid = Grid.empty(bufferZone)
+    val newGrid = Grid.empty(bufferZone, EmptyCell.Instance)
 
     def copyCells(x: Int, y: Int, cell: GridPart): Unit = {
       newGrid.cells(x)(y) = cell

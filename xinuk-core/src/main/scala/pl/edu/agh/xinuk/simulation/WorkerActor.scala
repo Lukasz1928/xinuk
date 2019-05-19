@@ -19,7 +19,7 @@ class WorkerActor[ConfigType <: XinukConfig](
                                               movesControllerFactory: (TreeSet[(Int, Int)], ConfigType) => MovesController,
                                               conflictResolver: ConflictResolver[ConfigType],
                                               smellPropagationFunction: (CellArray, Int, Int) => Vector[Option[SignalArray]],
-                                              emptyCellFactory: => SmellingCell = EmptyCell.Instance)(implicit config: ConfigType) extends Actor with Stash {
+                                              emptyCellFactory: => SmellingCell)(implicit config: ConfigType) extends Actor with Stash {
 
   import pl.edu.agh.xinuk.simulation.WorkerActor._
 
@@ -61,7 +61,7 @@ class WorkerActor[ConfigType <: XinukConfig](
       this.neighbours = neighbours.mkMap(_.position.neighbourId(id).get, identity)
       this.bufferZone = neighbours.foldLeft(TreeSet.empty[(Int, Int)])((builder, neighbour) => builder | neighbour.position.bufferZone)
       this.movesController = movesControllerFactory(bufferZone, config)
-      grid = Grid.empty(bufferZone)
+      grid = Grid.empty(bufferZone, EmptyCell.Instance)
       logger.info(s"${id.value} neighbours: ${neighbours.map(_.position).toList}")
       self ! StartIteration(1)
     case StartIteration(1) =>
@@ -170,7 +170,7 @@ object WorkerActor {
                                         movesControllerFactory: (TreeSet[(Int, Int)], ConfigType) => MovesController,
                                         conflictResolver: ConflictResolver[ConfigType],
                                         smellPropagationFunction: (CellArray, Int, Int) => Vector[Option[SignalArray]],
-                                        emptyCellFactory: => SmellingCell = EmptyCell.Instance
+                                        emptyCellFactory: => SmellingCell
                                       )(implicit config: ConfigType): Props = {
     Props(new WorkerActor(regionRef, movesControllerFactory, conflictResolver, smellPropagationFunction, emptyCellFactory))
   }
