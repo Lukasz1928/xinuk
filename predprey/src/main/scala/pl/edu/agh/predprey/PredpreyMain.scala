@@ -10,7 +10,6 @@ import pl.edu.agh.predprey.config.PredpreyConfig
 import pl.edu.agh.predprey.model.{LoudCell, PredpreyCell}
 import pl.edu.agh.predprey.model.parallel.PredpreyConflictResolver
 import pl.edu.agh.xinuk.Simulation
-import pl.edu.agh.xinuk.config.XinukConfig
 import pl.edu.agh.xinuk.model.{DefaultSmellPropagation, EmptyCell, Obstacle, SmellingCell}
 import pl.edu.agh.xinuk.simulation.WorkerActor
 
@@ -49,7 +48,6 @@ object PredpreyMain extends LazyLogging {
     }
 
     new Simulation(
-      configPrefix,
       metricHeaders,
       PredpreyConflictResolver,
       DefaultSmellPropagation.calculateSmellAddendsStandard,
@@ -59,7 +57,7 @@ object PredpreyMain extends LazyLogging {
         case LoudCell(_) => Color.WHITE
         case Obstacle() => Color.BLUE
         case cell: SmellingCell => cellToColorRegions(cell)
-      }).start()
+      })(rawConfig, config).start()
   }
 
   private def cellToColorRegions(cell: SmellingCell): Color = {

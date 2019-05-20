@@ -20,40 +20,15 @@ import scala.collection.immutable.TreeSet
 import scala.util.{Failure, Success, Try}
 
 class Simulation[ConfigType <: XinukConfig : ValueReader](
-  configPrefix: String,
   metricHeaders: Vector[String],
   conflictResolver: ConflictResolver[ConfigType],
   smellPropagationFunction: (CellArray, Int, Int) => Vector[Option[SignalArray]],
   emptyCellFactory: => SmellingCell)(
   movesControllerFactory: (TreeSet[(Int, Int)], ConfigType) => MovesController,
   cellToColor: PartialFunction[GridPart, Color] = PartialFunction.empty
-) extends LazyLogging {
+)(rawConfig: Config, implicit val config: ConfigType) extends LazyLogging {
 
-  private val rawConfig: Config =
-    Try(ConfigFactory.parseFile(new File("xinuk.conf")))
-      .filter(_.hasPath(configPrefix))
-      .getOrElse {
-        logger.info("Falling back to reference.conf")
-        ConfigFactory.empty()
-      }.withFallback(ConfigFactory.load("cluster.conf"))
 
-  private def logHeader: String = s"worker:${metricHeaders.mkString(";")}"
-
-  implicit val config: ConfigType = {
-    val forminConfig = rawConfig.getConfig(configPrefix)
-    logger.info(WorkerActor.MetricsMarker, forminConfig.root().render(ConfigRenderOptions.concise()))
-    logger.info(WorkerActor.MetricsMarker, logHeader)
-
-    import net.ceedubs.ficus.Ficus._
-    Try(forminConfig.as[ConfigType]("config")) match {
-      case Success(parsedConfig) =>
-        parsedConfig
-      case Failure(parsingError) =>
-        logger.error("Config parsing error.", parsingError)
-        System.exit(2)
-        throw new IllegalArgumentException
-    }
-  }
 
   private val system = ActorSystem(rawConfig.getString("application.name"), rawConfig)
   private val workerRegionRef: ActorRef =
