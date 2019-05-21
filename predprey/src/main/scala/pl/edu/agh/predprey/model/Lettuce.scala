@@ -4,7 +4,7 @@ import pl.edu.agh.predprey.config.PredpreyConfig
 import pl.edu.agh.xinuk.model.Cell.SmellArray
 import pl.edu.agh.xinuk.model._
 
-final case class LettuceCell(smell: SmellArray, lifespan: Long) extends SmellingCell {
+final case class LettuceCell(smell: SmellArray, lifespan: Long, signalInd: Int) extends SmellingCell {
   override type Self = LettuceCell
 
   override def withSmell(smell: SmellArray): LettuceCell = copy(smell = smell)
@@ -18,12 +18,12 @@ object LettuceAccessible {
 
   def unapply(arg: EmptyCell)(implicit config: PredpreyConfig): LettuceAccessible[LettuceCell] =
     new LettuceAccessible[LettuceCell] {
-      override def withLettuce(lifespan: Long): LettuceCell = LettuceCell(arg.smellWith(SignalArray(config.lettuceInitialSignal)), lifespan)
+      override def withLettuce(lifespan: Long): LettuceCell = LettuceCell(arg.smellWith(SignalArray(config.lettuceInitialSignal)), lifespan, config.lettuceSignalIndex)
     }
 
   def unapply(arg: BufferCell)(implicit config: PredpreyConfig):  LettuceAccessible[BufferCell] =
     new LettuceAccessible[BufferCell] {
-      override def withLettuce(lifespan: Long): BufferCell = BufferCell(LettuceCell(arg.smellWith(SignalArray(config.lettuceInitialSignal)), lifespan))
+      override def withLettuce(lifespan: Long): BufferCell = BufferCell(LettuceCell(arg.smellWith(SignalArray(config.lettuceInitialSignal)), lifespan, config.lettuceSignalIndex))
     }
 
   def unapply(arg: GridPart)(implicit config: PredpreyConfig): Option[LettuceAccessible[GridPart]] = arg match {

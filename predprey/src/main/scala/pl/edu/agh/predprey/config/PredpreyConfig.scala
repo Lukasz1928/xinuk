@@ -1,7 +1,7 @@
 package pl.edu.agh.predprey.config
 
 import pl.edu.agh.xinuk.config.{GuiType, XinukConfig}
-import pl.edu.agh.xinuk.model.{Energy, Signal, SignalArray}
+import pl.edu.agh.xinuk.model.{Energy, Signal}
 
 final case class PredpreyConfig(
                              gridSize: Int,
@@ -30,6 +30,9 @@ final case class PredpreyConfig(
                              rabbitEnergeticCapacity: Energy,
 
                              lettuceInitialSignal: Array[Signal],
+                             lettuceSignalIndex: Int,
                              rabbitInitialSignal: Array[Signal],
-                             wolfInitialSignal: Array[Signal]
+                             rabbitSignalIndex: Int,
+                             wolfInitialSignal: Array[Signal],
+                             wolfSignalIndex: Int
                            ) extends XinukConfig

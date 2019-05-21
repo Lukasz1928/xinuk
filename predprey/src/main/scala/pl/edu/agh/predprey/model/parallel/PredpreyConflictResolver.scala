@@ -1,7 +1,7 @@
 package pl.edu.agh.predprey.model.parallel
 
 import pl.edu.agh.predprey.config.PredpreyConfig
-import pl.edu.agh.predprey.model.{LettuceCell}
+import pl.edu.agh.predprey.model.{LettuceCell, RabbitCell, WolfCell}
 import pl.edu.agh.predprey.simulation.PredpreyMetrics
 import pl.edu.agh.xinuk.model._
 import pl.edu.agh.xinuk.model.parallel.ConflictResolver
@@ -16,24 +16,25 @@ object PredpreyConflictResolver extends ConflictResolver[PredpreyConfig] {
         (Obstacle(), PredpreyMetrics.empty())
       case (EmptyCell(currentSmell), EmptyCell(incomingSmell)) =>
         (EmptyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
-      case (LettuceCell(currentSmell, currentLifespan), EmptyCell(incomingSmell)) =>
-        (LettuceCell(currentSmell + incomingSmell, currentLifespan), PredpreyMetrics.empty())
-
-        //TODO
-
-//      case (EmptyCell(currentSmell), PredpreyCell(incomingSmell)) =>
-//        (PredpreyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
-//      case (PredpreyCell(currentSmell), PredpreyCell(incomingSmell)) =>
-//        (PredpreyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
-//      case (PredpreyCell(currentSmell), LoudCell(incomingSmell)) =>
-//        (PredpreyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
-//      case (LoudCell(incomingSmell), PredpreyCell(currentSmell)) =>
-//        (PredpreyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
-//      case (LoudCell(currentSmell), EmptyCell(incomingSmell)) =>
-//        (LoudCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
-//      case (EmptyCell(incomingSmell), LoudCell(currentSmell)) =>
-//        (LoudCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
-//      case (x, y) => throw new UnsupportedOperationException(s"Unresolved conflict: $x with $y")
+      case (LettuceCell(currentSmell, currentLifespan, signalInd), EmptyCell(incomingSmell)) =>
+        (LettuceCell(currentSmell + incomingSmell, currentLifespan, signalInd), PredpreyMetrics.empty())
+      case (LettuceCell(currentSmell, currentLifespan, signalInd), LettuceCell(incomingSmell, incomingLifespan, incomingSignalInd)) =>
+        (LettuceCell(currentSmell + incomingSmell, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
+      case (LettuceCell(currentSmell, currentLifespan, signalInd), RabbitCell(incomingSmell, energy, incomingLifespan, incomingSignalInd)) =>
+        (RabbitCell(currentSmell + incomingSmell, energy + config.lettuceEnergeticCapacity, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
+      case (LettuceCell(currentSmell, currentLifespan, signalInd), WolfCell(incomingSmell, energy, incomingLifespan, incomingSignalInd)) =>
+        (WolfCell(incomingSmell, energy, incomingLifespan, incomingSignalInd), PredpreyMetrics.empty())
+      case (RabbitCell(currentSmell, currentEnergy, currentLifespan, signalInd), RabbitCell(incomingSmell, incomingEnergy, incomingLifespan, incomingSignalInd)) =>
+        (RabbitCell(currentSmell + incomingSmell, currentEnergy + incomingEnergy, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
+      case (RabbitCell(currentSmell, currentEnergy, currentLifespan, signalInd), WolfCell(incomingSmell, energy, incomingLifespan, incomingSignalInd)) =>
+        (WolfCell(currentSmell + incomingSmell, energy + config.rabbitEnergeticCapacity, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
+      case (WolfCell(currentSmell, currentEnergy, currentLifespan, signalInd), WolfCell(incomingSmell, incomingEnergy, incomingLifespan, incomingSignalInd)) =>
+        (WolfCell(currentSmell + incomingSmell, currentEnergy + incomingEnergy, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
+      case (WolfCell(currentSmell, currentEnergy, currentLifespan, signalInd), EmptyCell(incomingSmell)) =>
+        (WolfCell(currentSmell + incomingSmell, currentEnergy, currentLifespan, signalInd), PredpreyMetrics.empty())
+      case (RabbitCell(currentSmell, currentEnergy, currentLifespan, signalInd), EmptyCell(incomingSmell)) =>
+        (RabbitCell(currentSmell + incomingSmell, currentEnergy, currentLifespan, signalInd), PredpreyMetrics.empty())
+      case (x, y) => throw new UnsupportedOperationException(s"Unresolved conflict: $x with $y")
     }
   }
 }
