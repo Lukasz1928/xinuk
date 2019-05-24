@@ -24,7 +24,7 @@ object ForminConflictResolver extends ConflictResolver[ForminConfig] {
         (AlgaeCell(currentSmell + incomingSmell, math.max(lifespan, incomingLifespan)), ForminMetrics.empty())
       case (ForaminiferaCell(currentEnergy, currentSmell, lifespan), ForaminiferaCell(incomingEnergy, incomingSmell, incomingLifespan)) =>
         (ForaminiferaCell(currentEnergy + incomingEnergy, currentSmell + incomingSmell, math.max(lifespan, incomingLifespan)), ForminMetrics.empty())
-      case (Obstacle, _) => (Obstacle, ForminMetrics.empty())
+      case (Obstacle(), _) => (Obstacle(), ForminMetrics.empty())
       case (x, y) => throw new UnsupportedOperationException(s"Unresolved conflict: $x with $y")
     }
   }

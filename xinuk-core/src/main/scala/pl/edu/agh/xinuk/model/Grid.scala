@@ -18,7 +18,12 @@ final case class Grid(cells: CellArray) extends AnyVal {
         val (newSmell, _) = addends.foldLeft(Array.ofDim[SignalArray](Cell.Size, Cell.Size), 0) {
           case ((cell, index), signalOpt) =>
             val (i, j) = SubcellCoordinates(index)
-              cell(i)(j) = (currentSmell(i)(j) * config.signalAttenuationFactor) + (signalOpt.getOrElse(SignalArray.Zero) * config.signalSuppressionFactor)
+            println("signalOpt: " + signalOpt.getOrElse(SignalArray.Zero).value.length)
+            println("sf: " + config.signalSuppressionFactor)
+              cell(i)(j) = (currentSmell(i)(j)
+                * config.signalAttenuationFactor) +
+                (signalOpt.getOrElse(SignalArray.Zero) *
+                  config.signalSuppressionFactor)
             (cell, index + 1)
         }
         newSmell(1)(1) = SignalArray.Zero
@@ -57,7 +62,9 @@ object Grid {
 
 
 final case class SignalArray(value: Array[Signal]) extends AnyVal {
-  def apply(index: Int): Signal = value(index)
+  def apply(index: Int): Signal = {
+    value(index)
+  }
 
   def +(other: SignalArray) = SignalArray(value.zipWithIndex.map{
     case (signal, index) => signal + other(index)
@@ -67,7 +74,9 @@ final case class SignalArray(value: Array[Signal]) extends AnyVal {
     case (signal, index) => signal - other(index)
   })
 
-  def *(scalars: List[Double]) = SignalArray(value.zip(scalars).map(x => x._1 * x._2))
+  def *(scalars: List[Double]): SignalArray = {
+    SignalArray(value.zip(scalars).map(x => x._1 * x._2))
+  }
 
   def /(scalars: List[Double]) = SignalArray(value.zip(scalars).map(x => x._1 / x._2))
 }
@@ -77,7 +86,6 @@ object SignalArray {
     def toSignalVector: SignalArray = SignalArray(signalList.toArray)
   }
 
-  final val Signals = 2
   def Zero(implicit config: XinukConfig) = SignalArray(Array.fill(config.smellsNumber)(Signal.Zero))
 }
 

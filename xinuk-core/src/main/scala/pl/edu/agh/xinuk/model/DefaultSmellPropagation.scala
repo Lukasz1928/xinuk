@@ -21,10 +21,10 @@ object DefaultSmellPropagation {
   }
 
   def calculateSmellAddendsCircular(cells: CellArray, x: Int, y: Int): Vector[Option[SignalArray]] = {
-    def sideToSide = List(1.0 / 3, 1.0 / 3)
-    def sideToCorner = List(1.0 / Math.sqrt(10), 1.0 / Math.sqrt(10))
-    def cornerToSide = List(1.0 / Math.sqrt(13), 1.0 / Math.sqrt(13))
-    def cornerToCorner = List(1.0 / (3 * Math.sqrt(2)), 1.0 / (3 * Math.sqrt(2)))
+    def sideToSide = List(1.0 / 3, 1.0 / 3, 1.0 / 3)
+    def sideToCorner = List(1.0 / Math.sqrt(10), 1.0 / Math.sqrt(10), 1.0 / Math.sqrt(10))
+    def cornerToSide = List(1.0 / Math.sqrt(13), 1.0 / Math.sqrt(13), 1.0 / Math.sqrt(13))
+    def cornerToCorner = List(1.0 / (3 * Math.sqrt(2)), 1.0 / (3 * Math.sqrt(2)), 1.0 / (3 * Math.sqrt(2)))
 
     @inline def destinationCellSignal(i: Int, j: Int): Option[SmellArray] = {
       cells.lift(x + i - 1).flatMap(_.lift(y + j - 1).map(_.smell))
