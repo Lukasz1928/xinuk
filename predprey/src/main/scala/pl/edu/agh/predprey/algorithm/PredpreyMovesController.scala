@@ -165,7 +165,7 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
         case Opt((i, j, RabbitAccessible(destination))) =>
           newGrid.cells(i)(j) = destination.withRabbit(cell.energy, cell.lifespan)
           newGrid.cells(i)(j) match {
-            case LettuceCell(_, _) =>
+            case LettuceCell(_, _,_) =>
             case _ =>
           }
         case Opt((i, j, inaccessibleDestination)) =>
@@ -182,7 +182,7 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
         case Opt((i, j, WolfAccessible(destination))) =>
           newGrid.cells(i)(j) = destination.withWolf(cell.energy, cell.lifespan)
           newGrid.cells(i)(j) match {
-            case RabbitCell(_, _, _) =>
+            case RabbitCell(_, _, _,_) =>
             case _ =>
           }
         case Opt((i, j, inaccessibleDestination)) =>
@@ -197,11 +197,11 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
       y <- 0 until config.gridSize
     } {
       grid.cells(x)(y) match {
-        case WolfCell(_, _, _) =>
+        case WolfCell(_, _, _,_) =>
           wolfCount += 1
-        case RabbitCell(_,_,_) =>
+        case RabbitCell(_,_,_,_) =>
           rabbitCount += 1
-        case LettuceCell(_,_) =>
+        case LettuceCell(_,_,_) =>
           lettuceCount += 1
         case _ =>
       }
