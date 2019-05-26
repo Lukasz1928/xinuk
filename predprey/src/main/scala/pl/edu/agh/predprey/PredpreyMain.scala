@@ -10,7 +10,7 @@ import pl.edu.agh.predprey.config.PredpreyConfig
 import pl.edu.agh.predprey.model.{LoudCell, PredpreyCell}
 import pl.edu.agh.predprey.model.parallel.PredpreyConflictResolver
 import pl.edu.agh.xinuk.Simulation
-import pl.edu.agh.xinuk.model.{DefaultSmellPropagation, EmptyCell, Obstacle, SmellingCell}
+import pl.edu.agh.xinuk.model._
 import pl.edu.agh.xinuk.simulation.WorkerActor
 
 import scala.util.{Failure, Success, Try}

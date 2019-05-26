@@ -13,14 +13,14 @@ object DefaultSmellPropagation {
     SubcellCoordinates.map {
       case (i, j) if i == 1 || j == 1 =>
         destinationCellSignal(i, j).map(signal =>
-          signal(i)(j) + signal(i + j - 1)(i + j - 1) + signal(i - j + 1)(j - i + 1)
-        )
+          signal(i)(j) + signal(i + j - 1)(i + j - 1) + signal(i - j + 1)(j - i + 1))
       case (i, j) =>
         destinationCellSignal(i, j).map(_.apply(i)(j))
     }
   }
 
   def calculateSmellAddendsCircular(cells: CellArray, x: Int, y: Int): Vector[Option[SignalArray]] = {
+    // Assumes 3 smells so far - will be changed when everything works
     def sideToSide = List(1.0 / 3, 1.0 / 3, 1.0 / 3)
     def sideToCorner = List(1.0 / Math.sqrt(10), 1.0 / Math.sqrt(10), 1.0 / Math.sqrt(10))
     def cornerToSide = List(1.0 / Math.sqrt(13), 1.0 / Math.sqrt(13), 1.0 / Math.sqrt(13))

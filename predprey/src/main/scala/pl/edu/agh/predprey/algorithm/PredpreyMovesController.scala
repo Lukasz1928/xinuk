@@ -15,18 +15,42 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
 
   override def initialGrid: (Grid, PredpreyMetrics) = {
     val grid = Grid.empty(bufferZone, EmptyCell.Instance)
-//    for(i <- 0 to 2) {
-//      for(j <- 0 to 2) {
-//        print(grid.cells(0)(0).smell(i)(j).value.length + " ")
-//      }
-//      print("\n")
-//    }
-//    print("\n")
-
+//    print("\nInitial Grid\n")
     grid.cells(3 * config.gridSize / 4)(3 * config.gridSize / 4) = PredpreyCell.create(SignalArray(config.predpreyCellInitialSignal))
-    grid.cells(config.gridSize / 4)(config.gridSize / 4) = LoudCell.create(SignalArray(config.loudCellInitialSignal))
+    //grid.cells(config.gridSize / 4)(config.gridSize / 4) = LoudCell.create(SignalArray(config.loudCellInitialSignal))
 
     val metrics = PredpreyMetrics.empty()
+
+//    var i = 0
+//    var j = 0
+//    var k = 0
+//    var l = 0
+//    var m = 0
+//    for(gr <- grid.cells) {
+//      println("i = " + i + "\n")
+//      i += 1
+//      j = 0
+//      for(gp <- gr) {
+//        println("\tj = " + j + "\n")
+//        j += 1
+//        k = 0
+//        for(sm <- gp.smell) {
+//          println("\t\tk = " + k + "\n")
+//          k += 1
+//          l = 0
+//          for(sm2 <- sm) {
+//            println("\t\t\tl = " + l + "\n")
+//            l += 1
+//            m = 0
+//            for(sig <- sm2.value) {
+//              println("\t\t\t\tm = " + m + ": " + sig)
+//              m += 1
+//            }
+//          }
+//        }
+//      }
+//    }
+
     (grid, metrics)
   }
 

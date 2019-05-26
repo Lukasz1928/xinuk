@@ -5,7 +5,6 @@ import pl.edu.agh.xinuk.model.Cell.SmellArray
 import pl.edu.agh.xinuk.model.Grid.CellArray
 
 final case class Grid(cells: CellArray) extends AnyVal {
-
   import Grid._
 
   def propagatedSignal(calculateSmellAddends: (CellArray, Int, Int) => Vector[Option[SignalArray]], x: Int, y: Int)(implicit config: XinukConfig): GridPart = {
@@ -15,15 +14,18 @@ final case class Grid(cells: CellArray) extends AnyVal {
       case smelling: SmellMedium =>
         val currentSmell = current.smell
         val addends = calculateSmellAddends(cells, x, y)
+        //println(addends.length)
         val (newSmell, _) = addends.foldLeft(Array.ofDim[SignalArray](Cell.Size, Cell.Size), 0) {
           case ((cell, index), signalOpt) =>
+            //print(signalOpt)
             val (i, j) = SubcellCoordinates(index)
-            println("signalOpt: " + signalOpt.getOrElse(SignalArray.Zero).value.length)
-            println("sf: " + config.signalSuppressionFactor)
-              cell(i)(j) = (currentSmell(i)(j)
-                * config.signalAttenuationFactor) +
-                (signalOpt.getOrElse(SignalArray.Zero) *
-                  config.signalSuppressionFactor)
+//            println("signalOpt length: " + signalOpt.getOrElse(SignalArray.Zero).value.length)
+//            print("signalOpt: ")
+//            for(x <- signalOpt.getOrElse(SignalArray.Zero).value) {
+//              print(x.value + " ")
+//            }
+//            println("\nsf: " + config.signalSuppressionFactor)
+            cell(i)(j) = (currentSmell(i)(j) * config.signalAttenuationFactor) + (signalOpt.getOrElse(SignalArray.Zero) * config.signalSuppressionFactor)
             (cell, index + 1)
         }
         newSmell(1)(1) = SignalArray.Zero
@@ -139,10 +141,7 @@ trait SmellMedium extends GridPart {
   }
 
   final def smellWithoutArray(deducted: SmellArray): SmellArray = {
-    for (k <- 0 to deducted.length) {
-      Array.tabulate(Cell.Size, Cell.Size)((i, j) => smell(k)(i)(j) - deducted(k)(i)(j))
-    }
-    smell
+    Array.tabulate(Cell.Size, Cell.Size)((i, j) => smell(i)(j) - deducted(i)(j))
   }
 
   def withSmell(smell: SmellArray): Self
@@ -169,7 +168,6 @@ object Cell {
   final val Size: Int = 3
 
   def emptySignal(implicit config: XinukConfig): SmellArray = Array.fill(Cell.Size, Cell.Size)(SignalArray.Zero)
-
 
 }
 
