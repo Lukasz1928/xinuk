@@ -1,6 +1,7 @@
 package pl.edu.agh.predprey.algorithm
 
 import com.avsystem.commons
+import com.avsystem.commons.SharedExtensions._
 import com.avsystem.commons.misc.Opt
 import pl.edu.agh.predprey.config.PredpreyConfig
 import pl.edu.agh.predprey.model._
@@ -60,13 +61,15 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
   }
 
   def calculatePossibleDestinations(cell: RabbitCell, x: Int, y: Int, grid: Grid): Iterator[(Int, Int, GridPart)] = {
-    //TODO
     val neighbourCellCoordinates = Grid.neighbourCellCoordinates(x, y)
     Grid.SubcellCoordinates
       .map {
         case (i, j) => cell.smell(i)(j)
       }
       .zipWithIndex
+      .map {
+        case (signalArray, index) => (signalArray(config.lettuceSignalIndex), index)
+      }
       .sorted(implicitly[Ordering[(Signal, Int)]].reverse)
       .iterator
       .map {
@@ -77,13 +80,15 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
   }
 
   def calculatePossibleDestinations(cell: WolfCell, x: Int, y: Int, grid: Grid): Iterator[(Int, Int, GridPart)] = {
-    //TODO
     val neighbourCellCoordinates = Grid.neighbourCellCoordinates(x, y)
     Grid.SubcellCoordinates
       .map {
         case (i, j) => cell.smell(i)(j)
       }
       .zipWithIndex
+      .map {
+        case (signalArray, index) => (signalArray(config.rabbitSignalIndex), index)
+      }
       .sorted(implicitly[Ordering[(Signal, Int)]].reverse)
       .iterator
       .map {
@@ -169,7 +174,6 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
             case _ =>
           }
         case Opt((i, j, inaccessibleDestination)) =>
-          throw new RuntimeException(s"Human selected inaccessible destination ($i,$j): $inaccessibleDestination")
         case Opt.Empty =>
           newGrid.cells(x)(y) = cell.copy(cell.smell, cell.energy, cell.lifespan)
       }
@@ -186,7 +190,6 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
             case _ =>
           }
         case Opt((i, j, inaccessibleDestination)) =>
-          throw new RuntimeException(s"Human selected inaccessible destination ($i,$j): $inaccessibleDestination")
         case Opt.Empty =>
           newGrid.cells(x)(y) = cell.copy(cell.smell, cell.energy, cell.lifespan)
       }
