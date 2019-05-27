@@ -56,6 +56,7 @@ object PredpreyMain extends LazyLogging {
         case LettuceCell(_, _,_) => Color.GREEN
         case RabbitCell(_, _, _, _) => Color.RED
         case WolfCell(_, _, _, _) => Color.GRAY
+        case Obstacle() => Color.BLUE
         case _ => Color.WHITE
       })(rawConfig, config).start()
   }
