@@ -50,7 +50,7 @@ object PredpreyMain extends LazyLogging {
     new Simulation(
       metricHeaders,
       PredpreyConflictResolver,
-      DefaultSmellPropagation.calculateSmellAddendsStandard,
+      DefaultSmellPropagation().calculateSmellAddendsStandard,
       EmptyCell.Instance)(new PredpreyMovesController(_)(_),
       {
         case PredpreyCell(_) => Color.WHITE

@@ -1,9 +1,10 @@
 package pl.edu.agh.xinuk.model
 
+import pl.edu.agh.xinuk.config.XinukConfig
 import pl.edu.agh.xinuk.model.Cell.SmellArray
 import pl.edu.agh.xinuk.model.Grid.{CellArray, SubcellCoordinates}
 
-object DefaultSmellPropagation {
+case class DefaultSmellPropagation()(implicit val config: XinukConfig) {
 
   def calculateSmellAddendsStandard(cells: CellArray, x: Int, y: Int): Vector[Option[SignalArray]] = {
     @inline def destinationCellSignal(i: Int, j: Int): Option[SmellArray] = {
@@ -20,11 +21,10 @@ object DefaultSmellPropagation {
   }
 
   def calculateSmellAddendsCircular(cells: CellArray, x: Int, y: Int): Vector[Option[SignalArray]] = {
-    // Assumes 3 smells so far - will be changed when everything works
-    def sideToSide = List(1.0 / 3, 1.0 / 3, 1.0 / 3)
-    def sideToCorner = List(1.0 / Math.sqrt(10), 1.0 / Math.sqrt(10), 1.0 / Math.sqrt(10))
-    def cornerToSide = List(1.0 / Math.sqrt(13), 1.0 / Math.sqrt(13), 1.0 / Math.sqrt(13))
-    def cornerToCorner = List(1.0 / (3 * Math.sqrt(2)), 1.0 / (3 * Math.sqrt(2)), 1.0 / (3 * Math.sqrt(2)))
+    def sideToSide = List.fill(config.smellsNumber)(1.0 / 3.0)
+    def sideToCorner = List.fill(config.smellsNumber)(1.0 / Math.sqrt(10))
+    def cornerToSide = List.fill(config.smellsNumber)(1.0 / Math.sqrt(13))
+    def cornerToCorner = List.fill(config.smellsNumber)(1.0 / (3 * Math.sqrt(2)))
 
     @inline def destinationCellSignal(i: Int, j: Int): Option[SmellArray] = {
       cells.lift(x + i - 1).flatMap(_.lift(y + j - 1).map(_.smell))
