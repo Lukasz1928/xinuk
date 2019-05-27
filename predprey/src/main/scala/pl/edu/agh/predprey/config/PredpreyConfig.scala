@@ -25,6 +25,8 @@ final case class PredpreyConfig(
                              rabbitStartEnergy: Energy,
 
                              lettuceReproductionFrequency: Int,
+                             rabbitReproductionFrequency: Int,
+                             wolfReproductionFrequency: Int,
 
                              lettuceEnergeticCapacity: Energy,
                              rabbitEnergeticCapacity: Energy,

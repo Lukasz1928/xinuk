@@ -158,8 +158,14 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
           }
         case cell: RabbitCell =>
           moveRabbit(cell, x, y)
+          if (iteration % config.rabbitReproductionFrequency == 0) {
+            reproduce(x, y) { case RabbitAccessible(accessible) => accessible.withRabbit(config.rabbitStartEnergy, 0) }
+          }
         case cell: WolfCell =>
           moveWolf(cell, x, y)
+          if (iteration % config.wolfReproductionFrequency == 0) {
+            reproduce(x, y) { case WolfAccessible(accessible) => accessible.withWolf(config.wolfStartEnergy, 0) }
+          }
       }
     }
 
