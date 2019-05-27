@@ -16,17 +16,17 @@ object PredpreyConflictResolver extends ConflictResolver[PredpreyConfig] {
         (Obstacle(), PredpreyMetrics.empty())
       case (EmptyCell(currentSmell), EmptyCell(incomingSmell)) =>
         (EmptyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
-      case (LettuceCell(currentSmell, currentLifespan, signalInd), EmptyCell(incomingSmell)) =>
-        (LettuceCell(currentSmell + incomingSmell, currentLifespan, signalInd), PredpreyMetrics.empty())
-      case (LettuceCell(currentSmell, currentLifespan, signalInd), LettuceCell(incomingSmell, incomingLifespan, incomingSignalInd)) =>
-        (LettuceCell(currentSmell + incomingSmell, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
-      case (LettuceCell(currentSmell, currentLifespan, signalInd), RabbitCell(incomingSmell, energy, incomingLifespan, incomingSignalInd)) =>
+      case (LettuceCell(currentSmell, currentEnergy, currentLifespan, signalInd), EmptyCell(incomingSmell)) =>
+        (LettuceCell(currentSmell + incomingSmell, currentEnergy, currentLifespan, signalInd), PredpreyMetrics.empty())
+      case (LettuceCell(currentSmell, currentEnergy, currentLifespan, signalInd), LettuceCell(incomingSmell, incomingEnergy, incomingLifespan, incomingSignalInd)) =>
+        (LettuceCell(currentSmell + incomingSmell, currentEnergy, currentLifespan, signalInd), PredpreyMetrics.empty())
+      case (LettuceCell(currentSmell, currentEnergy, currentLifespan, signalInd), RabbitCell(incomingSmell, energy, incomingLifespan, incomingSignalInd)) =>
         (RabbitCell(currentSmell + incomingSmell, energy + config.lettuceEnergeticCapacity, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
-      case (LettuceCell(currentSmell, currentLifespan, signalInd), WolfCell(incomingSmell, energy, incomingLifespan, incomingSignalInd)) =>
+      case (LettuceCell(currentSmell, currentEnergy, currentLifespan, signalInd), WolfCell(incomingSmell, energy, incomingLifespan, incomingSignalInd)) =>
         (WolfCell(incomingSmell, energy, incomingLifespan, incomingSignalInd), PredpreyMetrics.empty())
       case (RabbitCell(currentSmell, currentEnergy, currentLifespan, signalInd), RabbitCell(incomingSmell, incomingEnergy, incomingLifespan, incomingSignalInd)) =>
         (RabbitCell(currentSmell + incomingSmell, currentEnergy + incomingEnergy, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
-      case (RabbitCell(currentSmell, currentEnergy, currentLifespan, signalInd), LettuceCell(incomingSmell, incomingLifespan, incomingSignalInd)) =>
+      case (RabbitCell(currentSmell, currentEnergy, currentLifespan, signalInd), LettuceCell(incomingSmell, incomingEnergy, incomingLifespan, incomingSignalInd)) =>
         (RabbitCell(currentSmell + incomingSmell, currentEnergy + config.lettuceEnergeticCapacity, math.max(currentLifespan, incomingLifespan), signalInd), PredpreyMetrics.empty())
       case (RabbitCell(currentSmell, currentEnergy, currentLifespan, signalInd), WolfCell(incomingSmell, energy, incomingLifespan, incomingSignalInd)) =>
         (WolfCell(currentSmell + incomingSmell, energy + config.rabbitEnergeticCapacity, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
@@ -34,7 +34,7 @@ object PredpreyConflictResolver extends ConflictResolver[PredpreyConfig] {
         (WolfCell(currentSmell + incomingSmell, currentEnergy + incomingEnergy, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
       case (WolfCell(currentSmell, currentEnergy, currentLifespan, signalInd), RabbitCell(incomingSmell, incomingEnergy, incomingLifespan, incomingSignalInd)) =>
         (WolfCell(currentSmell + incomingSmell, currentEnergy + incomingEnergy, math.max(currentLifespan, incomingLifespan), incomingSignalInd), PredpreyMetrics.empty())
-      case (WolfCell(currentSmell, currentEnergy, currentLifespan, signalInd), LettuceCell(incomingSmell, incomingLifespan, incomingSignalInd)) =>
+      case (WolfCell(currentSmell, currentEnergy, currentLifespan, signalInd), LettuceCell(incomingSmell, incomingEnergy, incomingLifespan, incomingSignalInd)) =>
         (WolfCell(currentSmell + incomingSmell, currentEnergy, currentLifespan, signalInd), PredpreyMetrics.empty())
       case (WolfCell(currentSmell, currentEnergy, currentLifespan, signalInd), EmptyCell(incomingSmell)) =>
         (WolfCell(currentSmell + incomingSmell, currentEnergy, currentLifespan, signalInd), PredpreyMetrics.empty())
@@ -42,7 +42,7 @@ object PredpreyConflictResolver extends ConflictResolver[PredpreyConfig] {
         (RabbitCell(currentSmell + incomingSmell, currentEnergy, currentLifespan, signalInd), PredpreyMetrics.empty())
       case (EmptyCell(currentSmell), RabbitCell(incomingSmell, incomingEnergy, incomingLifespan, incomingSignalInd)) =>
         (EmptyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
-      case (EmptyCell(currentSmell), LettuceCell(incomingSmell, incomingLifespan, incomingSignalInd)) =>
+      case (EmptyCell(currentSmell), LettuceCell(incomingSmell, incomingEnergy, incomingLifespan, incomingSignalInd)) =>
         (EmptyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())
       case (EmptyCell(currentSmell), WolfCell(incomingSmell, energy, incomingLifespan, incomingSignalInd)) =>
         (EmptyCell(currentSmell + incomingSmell), PredpreyMetrics.empty())

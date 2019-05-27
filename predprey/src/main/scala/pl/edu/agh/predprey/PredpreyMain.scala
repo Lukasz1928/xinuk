@@ -53,7 +53,7 @@ object PredpreyMain extends LazyLogging {
       DefaultSmellPropagation().calculateSmellAddendsStandard,
       EmptyCell.Instance)(new PredpreyMovesController(_)(_),
       {
-        case LettuceCell(_, _,_) => Color.GREEN
+        case LettuceCell(_,_,_,_) => Color.GREEN
         case RabbitCell(_, _, _, _) => Color.RED
         case WolfCell(_, _, _, _) => Color.GRAY
         case Obstacle() => Color.BLUE

@@ -48,7 +48,7 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
             case 2 =>
               if (random.nextDouble() < config.lettuceSpawnChance) {
                 lettuceCount += 1
-                LettuceAccessible.unapply(EmptyCell.Instance).withLettuce(0)
+                LettuceAccessible.unapply(EmptyCell.Instance).withLettuce(config.lettuceStartEnergy, 0)
               } else {
                 grid.cells(x)(y)
               }
@@ -67,7 +67,7 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
       }
       .zipWithIndex
       .map {
-        case (signalArray, index) => (signalArray(config.lettuceSignalIndex), index)
+        case (signalArray, index) => (signalArray(config.rabbitSignalIndex), index)
       }
       .sorted(implicitly[Ordering[(Signal, Int)]].reverse)
       .iterator
@@ -86,7 +86,7 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
       }
       .zipWithIndex
       .map {
-        case (signalArray, index) => (signalArray(config.rabbitSignalIndex), index)
+        case (signalArray, index) => (signalArray(config.wolfSignalIndex), index)
       }
       .sorted(implicitly[Ordering[(Signal, Int)]].reverse)
       .iterator
@@ -149,11 +149,16 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
             newGrid.cells(x)(y) = cell
           }
         case cell: LettuceCell =>
-          if (iteration % config.lettuceReproductionFrequency == 0) {
-            reproduce(x, y) { case LettuceAccessible(accessible) => accessible.withLettuce(0) }
+          if(cell.energy < config.lettuceLifeActivityCost) {
+            killLettuce(cell, x, y)
           }
-          if (isEmptyIn(newGrid)(x, y)) {
-            newGrid.cells(x)(y) = cell.copy(lifespan = cell.lifespan + 1)
+          else {
+            if (iteration % config.lettuceReproductionFrequency == 0) {
+              reproduce(x, y) { case LettuceAccessible(accessible) => accessible.withLettuce(config.lettuceStartEnergy, 0) }
+            }
+            if (isEmptyIn(newGrid)(x, y)) {
+              newGrid.cells(x)(y) = cell.copy(energy = cell.energy - config.lettuceLifeActivityCost, lifespan = cell.lifespan + 1)
+            }
           }
         case cell: RabbitCell =>
           if (cell.energy < config.rabbitLifeActivityCost) {
@@ -178,6 +183,12 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
       }
     }
 
+    def killLettuce(cell: LettuceCell, x: Int, y: Int): Unit = {
+      val vacated = EmptyCell(cell.smell)
+      newGrid.cells(x)(y) = vacated
+      grid.cells(x)(y) = vacated
+    }
+
     def moveRabbit(cell: RabbitCell, x: Int, y: Int): Unit = {
       val destinations = calculatePossibleDestinations(cell, x, y, grid)
       val destination = selectDestinationCell(destinations, newGrid)
@@ -185,7 +196,7 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
         case Opt((i, j, RabbitAccessible(destination))) =>
           newGrid.cells(i)(j) = destination.withRabbit(cell.energy - config.rabbitLifeActivityCost, cell.lifespan + 1)
           newGrid.cells(i)(j) match {
-            case LettuceCell(_, _,_) =>
+            case LettuceCell(_,_, _,_) =>
             case _ =>
           }
         case Opt((i, j, _)) =>
@@ -227,11 +238,11 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
       y <- 0 until config.gridSize
     } {
       grid.cells(x)(y) match {
-        case WolfCell(_, _, _,_) =>
+        case WolfCell(_,_,_,_) =>
           wolfCount += 1
         case RabbitCell(_,_,_,_) =>
           rabbitCount += 1
-        case LettuceCell(_,_,_) =>
+        case LettuceCell(_,_,_,_) =>
           lettuceCount += 1
         case _ =>
       }

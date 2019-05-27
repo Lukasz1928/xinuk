@@ -21,8 +21,10 @@ final case class PredpreyConfig(
                              wolfSpawnChance: Double,
                              rabbitSpawnChance: Double,
                              lettuceSpawnChance: Double,
-                             wolfStartEnergy: Energy,
+
+                             lettuceStartEnergy: Energy,
                              rabbitStartEnergy: Energy,
+                             wolfStartEnergy: Energy,
 
                              lettuceReproductionFrequency: Int,
                              rabbitReproductionFrequency: Int,
@@ -38,6 +40,7 @@ final case class PredpreyConfig(
                              wolfInitialSignal: Array[Signal],
                              wolfSignalIndex: Int,
 
+                             lettuceLifeActivityCost: Energy,
                              rabbitLifeActivityCost: Energy,
                              wolfLifeActivityCost: Energy
                            ) extends XinukConfig
