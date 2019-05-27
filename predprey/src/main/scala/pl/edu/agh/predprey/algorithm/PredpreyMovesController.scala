@@ -156,14 +156,24 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
             newGrid.cells(x)(y) = cell.copy(lifespan = cell.lifespan + 1)
           }
         case cell: RabbitCell =>
-          moveRabbit(cell, x, y)
-          if (iteration % config.rabbitReproductionFrequency == 0) {
-            reproduce(x, y) { case RabbitAccessible(accessible) => accessible.withRabbit(config.rabbitStartEnergy, 0) }
+          if (cell.energy < config.rabbitLifeActivityCost) {
+            killRabbit(cell, x, y)
+          }
+          else {
+            moveRabbit(cell, x, y)
+            if (iteration % config.rabbitReproductionFrequency == 0) {
+              reproduce(x, y) { case RabbitAccessible(accessible) => accessible.withRabbit(config.rabbitStartEnergy, 0) }
+            }
           }
         case cell: WolfCell =>
-          moveWolf(cell, x, y)
-          if (iteration % config.wolfReproductionFrequency == 0) {
-            reproduce(x, y) { case WolfAccessible(accessible) => accessible.withWolf(config.wolfStartEnergy, 0) }
+          if (cell.energy < config.wolfLifeActivityCost) {
+            killWolf(cell, x, y)
+          }
+          else {
+            moveWolf(cell, x, y)
+            if (iteration % config.wolfReproductionFrequency == 0) {
+              reproduce(x, y) { case WolfAccessible(accessible) => accessible.withWolf(config.wolfStartEnergy, 0) }
+            }
           }
       }
     }
@@ -173,15 +183,21 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
       val destination = selectDestinationCell(destinations, newGrid)
       destination match {
         case Opt((i, j, RabbitAccessible(destination))) =>
-          newGrid.cells(i)(j) = destination.withRabbit(cell.energy, cell.lifespan)
+          newGrid.cells(i)(j) = destination.withRabbit(cell.energy - config.rabbitLifeActivityCost, cell.lifespan + 1)
           newGrid.cells(i)(j) match {
             case LettuceCell(_, _,_) =>
             case _ =>
           }
-        case Opt((i, j, inaccessibleDestination)) =>
+        case Opt((i, j, _)) =>
         case Opt.Empty =>
           newGrid.cells(x)(y) = cell.copy(cell.smell, cell.energy, cell.lifespan)
       }
+    }
+
+    def killRabbit(cell: RabbitCell, x: Int, y: Int): Unit = {
+      val vacated = EmptyCell(cell.smell)
+      newGrid.cells(x)(y) = vacated
+      grid.cells(x)(y) = vacated
     }
 
     def moveWolf(cell: WolfCell, x: Int, y: Int): Unit = {
@@ -189,15 +205,21 @@ final class PredpreyMovesController(bufferZone: TreeSet[(Int, Int)])(implicit co
       val destination = selectDestinationCell(destinations, newGrid)
       destination match {
         case Opt((i, j, WolfAccessible(destination))) =>
-          newGrid.cells(i)(j) = destination.withWolf(cell.energy, cell.lifespan)
+          newGrid.cells(i)(j) = destination.withWolf(cell.energy - config.wolfLifeActivityCost, cell.lifespan + 1)
           newGrid.cells(i)(j) match {
             case RabbitCell(_, _, _,_) =>
             case _ =>
           }
-        case Opt((i, j, inaccessibleDestination)) =>
+        case Opt((i, j, _)) =>
         case Opt.Empty =>
           newGrid.cells(x)(y) = cell.copy(cell.smell, cell.energy, cell.lifespan)
       }
+    }
+
+    def killWolf(cell: WolfCell, x: Int, y: Int): Unit = {
+      val vacated = EmptyCell(cell.smell)
+      newGrid.cells(x)(y) = vacated
+      grid.cells(x)(y) = vacated
     }
 
     for {

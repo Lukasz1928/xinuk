@@ -36,5 +36,8 @@ final case class PredpreyConfig(
                              rabbitInitialSignal: Array[Signal],
                              rabbitSignalIndex: Int,
                              wolfInitialSignal: Array[Signal],
-                             wolfSignalIndex: Int
+                             wolfSignalIndex: Int,
+
+                             rabbitLifeActivityCost: Energy,
+                             wolfLifeActivityCost: Energy
                            ) extends XinukConfig
